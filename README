@@ -17,3 +17,7 @@ name based ipsets (with the corresponding service) and a service suitable
 to just create ipsets early on during system boot, so that other services
 (eg. restoring of iptables entries referencing an ipset) have the ipsets 
 available when they need them.
+
+Installation:
+
+Copy the ipnameset and ipnameset-helper files from bin to /usr/local/bin

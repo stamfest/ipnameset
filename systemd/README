@@ -16,3 +16,8 @@ them:
     systemctl enable ipnameset.timer ipnameset.service ipnameset-create.service
     systemctl start ipnameset.timer
 
+Note: The ipnameset and ipnameset-helper utilities must be installed into
+/usr/local/bin before this will work. If you change the installation path
+cyou may have to change the service and timer files. Also take care that 
+ipnameset-helper knows where to find ipnameset (Currently this is handled
+by assuming ipnameset is on the standard PATH).
