@@ -1,0 +1,13 @@
+[Unit]
+Description=Create ipnameset name based ipsets
+Wants=network-pre.target local-fs.target
+Before=netfilter-persistent.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/ipnameset-helper create
+
+[Install]
+WantedBy=multi-user.target
+

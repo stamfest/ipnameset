@@ -1,0 +1,102 @@
+#!/usr/bin/env python3
+
+# handles name-base ipsets
+
+import socket
+import sys
+import os
+import argparse
+import subprocess
+
+def p():
+    """Set up command line parsing."""
+    parser = argparse.ArgumentParser(description='ipnameset')
+    parser.add_argument('set1')
+    parser.add_argument('set2', nargs='?', default='')
+    parser.add_argument('--create-only', dest='createonly', action='store_true',
+                        help="only create sets. This is suitable for cases where " + 
+                            "DNS is not yet available but the set is required for some reason")
+    parser.add_argument('-6', dest='ip6', action='store_true',
+                        help='add IPv6 addresses to set1, otherwise add IPv4 addresses')
+    parser.add_argument('--rmset2', dest='rmset2', action='store_true',
+                        help='delete set2 as final step')
+    parser.add_argument('--dry', dest='dry', action='store_true',
+                        help='show final ipset script suitable for ipset restore, do not actually execute it')
+
+    cmdline = parser.parse_args()
+    if cmdline.set2 == '':
+        cmdline.set2 = cmdline.set1 + "-temp"
+        cmdline.rmset2 = True
+    return cmdline
+
+def nameset(cmds, cmdline):
+    """
+    Read hostnames from stdin, turn them into a list of IP addresses and 
+    add them to the set.
+
+    Lines starting with "#" are ignored.
+
+    Arguments:
+    cmds -- a list to append ipset commands to
+    cmdline -- The result of command line parsing through argparse.parse_args
+    """
+    if cmdline.ip6:
+        addrFamily = socket.AddressFamily.AF_INET6
+    else:
+        addrFamily = socket.AddressFamily.AF_INET
+
+    for line in sys.stdin:
+        line = line.strip()
+        if line == '':
+            # skip empty lines
+            continue
+
+        if line.startswith("#"):
+            # skip comment lines
+            continue
+
+        try:
+            many = socket.getaddrinfo(line, 0, 0, socket.SocketKind.SOCK_STREAM)
+        except:
+            print("Cannot add '%s'" % (line), file=sys.stderr)
+            continue
+
+        for a in many:
+            if a[0] == addrFamily:
+                cmds.append("add %s %s -exist" % (cmdline.set2, a[4][0]))
+
+def main():
+    cmdline = p()
+    ipset_cmds = []
+
+    family = "inet"
+    if cmdline.ip6:
+        family = "inet6"
+
+    ipset_cmds.append("create %s hash:ip family %s -exist" % (cmdline.set1, family))
+
+    if not cmdline.createonly:
+        ipset_cmds.append("create %s hash:ip family %s -exist" % (cmdline.set2, family))
+        ipset_cmds.append("flush %s" % (cmdline.set2))
+
+        nameset(ipset_cmds, cmdline)
+
+        ipset_cmds.append("swap %s %s" % (cmdline.set1, cmdline.set2))
+
+        if cmdline.rmset2:
+            ipset_cmds.append("destroy %s" % (cmdline.set2))
+
+    if cmdline.dry:
+        for c in ipset_cmds:
+            print(c)
+        sys.exit(0)
+    else:
+        proc = subprocess.Popen(["ipset", "restore"], stdin = subprocess.PIPE, text=True)
+        for c in ipset_cmds:
+            proc.stdin.write(c + "\n")
+        proc.stdin.close()
+        proc.wait()
+        sys.exit(proc.returncode)
+
+if __name__ == '__main__':
+    main()

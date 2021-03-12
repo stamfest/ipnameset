@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+OP="$1"
+DIR="$2"
+DIR=${DIR:=/etc/ipnameset}
+
+OPTS=
+
+function usage {
+    cat >&2 <<EOF
+$0 create|populate [<DIR>]
+Creates or populates/updates ipset sets based on files in <DIR>
+
+Default for <DIR> is /etc/ipnameset
+
+For every files matching *.ip4 an IPv4 based ip set is created
+or populated with IP4 addresses obtained for every host name in the
+file.
+
+For every files matching *.ip6 an IPv6 based ip set is created
+or populated with IP6 addresses obtained for every host name in the
+file.
+EOF
+    exit 1
+}
+
+case "$OP" in
+    create)
+        OPTS=--create-only
+        ;;
+    populate)
+        ;;
+    *)
+        usage
+        ;;
+esac
+
+for F in $DIR/*.ip4; do
+    if [ -f "$F" ] ; then
+        SET=$(basename "$F" .ip4)
+        ipnameset $OPTS $SET < $F
+    fi
+done
+
+for F in $DIR/*.ip6; do
+    if [ -f "$F" ] ; then
+        SET=$(basename "$F" .ip6)
+        ipnameset -6 $OPTS $SET < $F
+    fi
+done
+
+

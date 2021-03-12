@@ -1,0 +1,9 @@
+[Unit]
+Description=Periodically update name based ip sets
+
+[Timer]
+#OnCalendar = *-*-* *:6,21,36,51:00
+OnCalendar = *-*-* *:*:00
+
+[Install]
+WantedBy=multi-user.target

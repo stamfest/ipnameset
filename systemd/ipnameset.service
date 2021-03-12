@@ -1,0 +1,5 @@
+[Unit]
+Description=Update ipnameset name based ipset
+
+[Service]
+ExecStart=/usr/local/bin/ipnameset-helper populate
