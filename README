@@ -1,0 +1,19 @@
+Manages ipset based sets of IP addresses by using DNS information.
+
+The ipnameset utility creates and atomically updates existing ipsets based
+on lists of hostnames.
+
+The ipnameset-helper wraps ipnameset and handles ipsets based on files in
+the /et/ipnameset directory.
+
+Files with an .ip4 extension are turned into IPv4 ipsets named like the file 
+(without the extension) where every line corresponds to a hostname or an
+IPv4 address.
+
+The same is done for files with an .ip6 extension but for IPv6 addresses.
+
+The systemd directory contains examples for a timer to take care of updateing
+name based ipsets (with the corresponding service) and a service suitable
+to just create ipsets early on during system boot, so that other services
+(eg. restoring of iptables entries referencing an ipset) have the ipsets 
+available when they need them.
