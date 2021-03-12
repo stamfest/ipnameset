@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 
+# (c) 2021 by Peter Stamfest <peter@stamfest.at>
+#
+# This file can be used under the terms of GPLv3
+ä
 # handles name-base ipsets
+
 
 import socket
 import sys

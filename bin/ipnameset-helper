@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# (c) 2021 by Peter Stamfest <peter@stamfest.at>
+#
+# This file can be used under the terms of GPLv3
+
 OP="$1"
 DIR="$2"
 DIR=${DIR:=/etc/ipnameset}
