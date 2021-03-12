@@ -1,0 +1,18 @@
+The ipnameset.timer and ipnameset.service files should be suitable for most
+systemd based systems.
+
+The ipnameset-create.service is currently designed to work with raspian 
+systems using the netfilter-persistent.service to handle iptables setup
+during boot.
+
+Installation:
+
+Create the directory /etc/ipnameset and populate it with .ip4 and .ip6 
+files.
+
+Copy the timer and service files to /etc/systemd/system and enable / start 
+them:
+
+    systemctl enable ipnameset.timer ipnameset.service ipnameset-create.service
+    systemctl start ipnameset.timer
+
