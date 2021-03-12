@@ -4,6 +4,10 @@ Description=Periodically update name based ip sets
 [Timer]
 # Run every 15 minutes on second 17
 OnCalendar = *-*-* *:6,21,36,51:17
+# And a couple of times after startup...
+OnBootSec = 60
+OnBootSec = 120
+OnBootSec = 240
 
 [Install]
 WantedBy=multi-user.target
